@@ -1,0 +1,104 @@
+#include <cryptopp/sha.h>
+#include <cryptopp/filters.h>
+//using CryptoPP::StringSink;
+//using CryptoPP::StringSource;
+//using CryptoPP::HashFilter;
+#include <cryptopp/randpool.h>
+#include <cryptopp/secblock.h>
+#include <cryptopp/cryptlib.h>
+#include <cryptopp/aes.h>
+#include <cryptopp/modes.h>
+//using CryptoPP::CFB_Mode;
+
+#include <assert.h>
+#include <cstdio>
+
+#ifndef AES256_H_DEFINED
+#define AES256_H_DEFINED
+
+namespace Cipher{
+    static const unsigned KEYLEN_B = 256/8;
+
+    enum class WrapperType {
+        Encryptor, Decryptor
+    };
+
+    class AES256_initter {
+        byte key[KEYLEN_B + 1];
+        byte iv[KEYLEN_B];
+
+        static void calc_key(byte * dst, const char * pass) {
+            hash(dst, pass);
+        }
+        static void calc_iv(byte * dst, const byte * key) {
+            hash(dst, (const char *) key);
+            assert(key[KEYLEN_B] == '\0');
+        }
+
+    public:
+        AES256_initter(const std::string & pass) {
+            calc_key(key, pass.c_str());
+            key[KEYLEN_B] = '\0';
+
+            calc_iv(iv, key);
+        }
+
+        const byte * getKey() const{
+            return key;
+        }
+        const byte * getIV() const {
+            return iv;
+        }
+
+        static void hash(byte * dst, const char * src, const unsigned len = KEYLEN_B, CryptoPP::SHA256 sha = CryptoPP::SHA256()) {
+            using namespace CryptoPP;
+
+            ByteQueue * result = new ByteQueue;
+            HashFilter * hash_filter = new HashFilter(sha, result);
+            StringSource s(src, true, hash_filter);
+            result->Peek(dst, len);
+        }
+
+        ~AES256_initter() {}
+    };
+
+    class AES256_encryptor {
+        CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption * enc;
+
+    public:
+        AES256_encryptor(const std::string & pass) {
+            AES256_initter initter(pass);
+
+            const byte * key_p = initter.getKey(), * IV_p = initter.getIV();
+            enc = new CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption(key_p, KEYLEN_B, IV_p);
+        };
+        ~AES256_encryptor() {
+            delete enc;
+        };
+
+        void encrypt(byte * array, const unsigned len) {
+            enc->ProcessData(array, array, len);
+        }
+    };
+
+    class AES256_decryptor {
+        CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption * dec;
+
+    public:
+        AES256_decryptor(const std::string & pass) {
+            AES256_initter initter(pass);
+
+            const byte * key_p = initter.getKey(), * IV_p = initter.getIV();
+            dec = new CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption(key_p, KEYLEN_B, IV_p);
+        };
+        ~AES256_decryptor() {
+            delete dec;
+        };
+
+        void decrypt(byte * array, const unsigned len) {
+            dec->ProcessData(array, array, len);
+        }
+    };
+}
+
+#endif //AES256_H_DEFINED
