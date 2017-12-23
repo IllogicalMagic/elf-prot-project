@@ -5,14 +5,10 @@
 
 #include <elfio/elfio.hpp>
 
-#include <unistd.h>
-#include <sys/mman.h>
-
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
 
-#include <fstream>
 #include <string>
 #include <sstream>
 

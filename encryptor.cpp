@@ -12,11 +12,11 @@ int main (int argc, char * argv[]) {
     std::string pass;
     loadfile_into_str(argv[2], Mode::binary, pass);
 
-    std::vector<byte> obj;
+    std::vector<CryptoPP::byte> obj;
     loadfile_into_vector(argv[1], Mode::binary, obj);
 
     AES256_encryptor enc(pass);
-    enc.encrypt(obj.data(), obj.size() + 1);
+    enc.encrypt(obj.data(), obj.size());
 
     std::ofstream out(argv[3], Mode::binary & Mode::out);
     for (auto i: obj) {

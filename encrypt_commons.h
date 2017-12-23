@@ -27,7 +27,7 @@ namespace Cipher {
         dst = std::string(std::istreambuf_iterator<char>(file_stream), tmp);
     }
 
-    void loadfile_into_vector(char * fp, ModeT op_mode, std::vector<byte> & dst) {
+    void loadfile_into_vector(char * fp, ModeT op_mode, std::vector<CryptoPP::byte> & dst) {
         if (!validate_filepath(fp)) {
             std::cout << "Filepath is incorrect\n";
             exit(-1);
@@ -35,7 +35,7 @@ namespace Cipher {
         std::ifstream file_stream(fp, op_mode & Mode::in);
 
         std::istreambuf_iterator<char> tmp;
-        dst = std::vector<byte>(std::istreambuf_iterator<char>(file_stream), tmp);
+        dst = std::vector<CryptoPP::byte>(std::istreambuf_iterator<char>(file_stream), tmp);
     }
 }
 

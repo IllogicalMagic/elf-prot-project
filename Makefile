@@ -2,7 +2,8 @@ CXX?=g++
 CC=$(CXX)
 INCDIR?=
 CXXFLAGS?=-std=c++17 -Wall -O0 -g -I$(INCDIR)
-LDLIBS?=-lcryptopp -lpthread
+LDFLAGS?=
+LDLIBS?=-lcryptopp -lpthread -lstdc++fs
 
 Loader: Loader.o ExecutableHolder.o DebugChecker.o
 
