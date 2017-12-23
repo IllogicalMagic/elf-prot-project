@@ -1,9 +1,10 @@
-    .global Executable
+.section .data
+        .global Executable
 Executable:
     .quad .+8
     .incbin "data"
 data_end:
 
-    .global Exec_len
-Exec_len:
+    .global ExecLen
+ExecLen:
     .int data_end - Executable - 8

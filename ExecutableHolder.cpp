@@ -112,7 +112,7 @@ void ExeHolder::memoryInit(ELFIO::elfio &Reader) {
 
 void nop() {}
 
-void initAll(void *Entry) {
+void initAll(void *Entry, int &Result) {
   // Pass this to _start function.
   struct Args {
     long argc;
@@ -132,9 +132,7 @@ void initAll(void *Entry) {
 
   // Pass function to be called at exit in %rdi and
   // additional args on the stack.
-  int Res = reinterpret_cast<EAddrFn>(Entry)(nop, A);
-
-  fprintf(stderr, "Result is %d\n", Res);
+  Result = reinterpret_cast<EAddrFn>(Entry)(nop, A);
 }
 
 void ExeHolder::transferControl(ELFIO::elfio &Reader) {
@@ -143,21 +141,9 @@ void ExeHolder::transferControl(ELFIO::elfio &Reader) {
 
   char *EAddr = (char *)AllocPtr + Offset + Entry;
   {
-    std::thread T(initAll, EAddr);
+    std::thread T(initAll, EAddr, std::ref(RetCode));
     T.join();
   }
-    
-  // pthread_t Pt;
-  
-  // errno = 0;
-  // if (pthread_create(&Pt, nullptr, initAll, EAddr)) {
-  //   reportErrorAndExit("pthread create error");
-  // }
-
-  // errno = 0;
-  // if (pthread_join(Pt, nullptr)) {
-  //   reportErrorAndExit("pthread join error");
-  // }
 }
 
 ExeHolder::~ExeHolder() {
