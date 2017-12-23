@@ -1,10 +1,10 @@
+#ifndef ENCRYPT_COMMONS_H_DEFINED
+#define ENCRYPT_COMMONS_H_DEFINED
+
 #include "aes256.h"
 #include <iostream>
 #include <fstream>
 #include <experimental/filesystem>
-
-#ifndef ENCRYPT_COMMONS_H_DEFINED
-#define ENCRYPT_COMMONS_H_DEFINED
 
 namespace Cipher {
     namespace fs = std::experimental::filesystem;
